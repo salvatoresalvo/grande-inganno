@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Il Grande Inganno: da Adamo ed Eva all'Algoritmo</title>
+  <meta name="description" content="Esplora il parallelo tra il mito di Adamo ed Eva e i moderni meccanismi di controllo digitale. Una pagina interattiva basata sull'analisi di Salvatore Iovino.">
+  <link rel="canonical" href="https://www.salvatoreiovino.it/2026/03/il-grande-inganno-da-adamo-ed-eva.html" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://grande-inganno.salvatoreiovino.it/">
+  <meta property="og:title" content="Il Grande Inganno: da Adamo ed Eva all'Algoritmo">
+  <meta property="og:description" content="Siamo passati dal timore di Dio alla paura di non ricevere abbastanza 'like': il gioco è lo stesso, è solo cambiato il mazzo di carte.">
+  <meta property="og:image" content="https://grande-inganno.salvatoreiovino.it/hero-image.jpg">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://grande-inganno.salvatoreiovino.it/">
+  <meta property="twitter:title" content="Il Grande Inganno: da Adamo ed Eva all'Algoritmo">
+  <meta property="twitter:description" content="Siamo passati dal timore di Dio alla paura di non ricevere abbastanza 'like': il gioco è lo stesso, è solo cambiato il mazzo di carte.">
+  <meta property="twitter:image" content="https://grande-inganno.salvatoreiovino.it/hero-image.jpg">
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --dark: #0a0a0a;
+      --dark-2: #111111;
+      --dark-3: #1a1a1a;
+      --dark-4: #222222;
+      --text: #e8e0d0;
+      --text-muted: #8a8070;
+      --accent-red: #8b1a1a;
+      --accent-blue: #1a3a8b;
+      --neon-blue: #4fc3f7;
+      --neon-cyan: #00e5ff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--dark);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('hero-image.jpg');
+      background-size: cover;
+      background-position: center top;
+      filter: brightness(0.35) saturate(0.8);
+      transform: scale(1.05);
+      transition: transform 8s ease;
+    }
+
+    .hero-bg.loaded {
+      transform: scale(1.0);
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.2) 0%,
+        rgba(0,0,0,0.1) 40%,
+        rgba(10,10,10,0.85) 80%,
+        rgba(10,10,10,1) 100%
+      );
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 2rem;
+      max-width: 900px;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      padding: 0.35rem 1rem;
+      border-radius: 2px;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.3s forwards;
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 7vw, 5.5rem);
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.6s forwards;
+    }
+
+    .hero-title .highlight {
+      color: var(--gold);
+      font-style: italic;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
+      font-weight: 300;
+      line-height: 1.7;
+      color: rgba(232, 224, 208, 0.85);
+      max-width: 680px;
+      margin: 0 auto 2.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.9s forwards;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: var(--gold);
+      color: var(--dark);
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.9rem 2rem;
+      border-radius: 2px;
+      text-decoration: none;
+      transition: background 0.3s, transform 0.3s;
+      opacity: 0;
+      animation: fadeUp 0.8s 1.2s forwards;
+    }
+
+    .hero-cta:hover {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 1.5s forwards;
+    }
+
+    .scroll-indicator span {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 50px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scrollPulse 2s infinite;
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; transform: scaleY(1); }
+      50% { opacity: 1; transform: scaleY(1.2); }
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1.2rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.4s, backdrop-filter 0.4s;
+    }
+
+    nav.scrolled {
+      background: rgba(10, 10, 10, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(201, 168, 76, 0.15);
+    }
+
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--gold);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: var(--gold);
+    }
+
+    /* ─── SECTIONS ─── */
+    section {
+      padding: 6rem 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, var(--gold), transparent);
+      max-width: 80px;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-text {
+      font-size: 1.05rem;
+      line-height: 1.85;
+      color: rgba(232, 224, 208, 0.8);
+      max-width: 720px;
+    }
+
+    /* ─── PARALLELO VISIVO ─── */
+    .parallelo {
+      background: var(--dark-2);
+      padding: 6rem 2rem;
+    }
+
+    .parallelo-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 2rem;
+      align-items: start;
+      margin-top: 3rem;
+    }
+
+    .comparison-col {
+      background: var(--dark-3);
+      border-radius: 4px;
+      padding: 2.5rem;
+      border-top: 3px solid;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .comparison-col::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0.04;
+      background-size: cover;
+    }
+
+    .comparison-col.antico {
+      border-color: #8b4513;
+    }
+
+    .comparison-col.antico::before {
+      background: radial-gradient(circle at top right, #8b4513, transparent);
+      opacity: 0.15;
+    }
+
+    .comparison-col.moderno {
+      border-color: var(--neon-blue);
+    }
+
+    .comparison-col.moderno::before {
+      background: radial-gradient(circle at top left, var(--neon-blue), transparent);
+      opacity: 0.1;
+    }
+
+    .comparison-col h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .comparison-col.antico h3 { color: #c8784a; }
+    .comparison-col.moderno h3 { color: var(--neon-blue); }
+
+    .comparison-item {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+      align-items: flex-start;
+    }
+
+    .comparison-icon {
+      font-size: 1.2rem;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+
+    .comparison-item p {
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: rgba(232, 224, 208, 0.75);
+    }
+
+    .comparison-item strong {
+      color: var(--text);
+      display: block;
+      margin-bottom: 0.25rem;
+      font-size: 0.95rem;
+    }
+
+    .vs-divider {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding-top: 3rem;
+    }
+
+    .vs-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 1.1rem;
+      color: var(--dark);
+      box-shadow: 0 0 30px rgba(201, 168, 76, 0.4);
+    }
+
+    .vs-line {
+      width: 1px;
+      height: 80px;
+      background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+    }
+
+    /* ─── TRE VERITÀ ─── */
+    .verita-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    .verita-card {
+      background: var(--dark-3);
+      border-radius: 4px;
+      padding: 2.5rem;
+      border-left: 3px solid var(--gold);
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .verita-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+
+    .verita-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 4rem;
+      font-weight: 900;
+      color: rgba(201, 168, 76, 0.12);
+      position: absolute;
+      top: 1rem;
+      right: 1.5rem;
+      line-height: 1;
+    }
+
+    .verita-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    .verita-card p {
+      font-size: 0.92rem;
+      line-height: 1.7;
+      color: rgba(232, 224, 208, 0.75);
+    }
+
+    /* ─── CHART SECTION ─── */
+    .chart-section {
+      background: var(--dark-2);
+      padding: 6rem 2rem;
+    }
+
+    .chart-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .chart-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin: 2.5rem 0 2rem;
+      flex-wrap: wrap;
+    }
+
+    .chart-tab {
+      padding: 0.6rem 1.4rem;
+      border-radius: 2px;
+      border: 1px solid rgba(201, 168, 76, 0.3);
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .chart-tab.active,
+    .chart-tab:hover {
+      background: var(--gold);
+      color: var(--dark);
+      border-color: var(--gold);
+    }
+
+    .chart-container {
+      background: var(--dark-3);
+      border-radius: 4px;
+      padding: 2rem;
+      position: relative;
+      height: 380px;
+    }
+
+    .chart-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 1rem;
+      font-style: italic;
+    }
+
+    /* ─── MECCANISMI MODERNI ─── */
+    .meccanismi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    .meccanismo-card {
+      background: var(--dark-3);
+      border-radius: 4px;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s;
+    }
+
+    .meccanismo-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .meccanismo-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(to right, var(--neon-cyan), var(--neon-blue));
+      transform: scaleX(0);
+      transition: transform 0.4s;
+    }
+
+    .meccanismo-card:hover::after {
+      transform: scaleX(1);
+    }
+
+    .meccanismo-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .meccanismo-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--neon-cyan);
+      margin-bottom: 0.75rem;
+    }
+
+    .meccanismo-card p {
+      font-size: 0.88rem;
+      line-height: 1.65;
+      color: rgba(232, 224, 208, 0.7);
+    }
+
+    /* ─── QUOTE ─── */
+    .quote-section {
+      background: linear-gradient(135deg, var(--dark-3) 0%, #0d0d1a 100%);
+      padding: 6rem 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .quote-section::before {
+      content: '"';
+      position: absolute;
+      top: -2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Playfair Display', serif;
+      font-size: 20rem;
+      color: rgba(201, 168, 76, 0.04);
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .quote-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.4rem, 3vw, 2.2rem);
+      font-style: italic;
+      line-height: 1.5;
+      max-width: 800px;
+      margin: 0 auto 2rem;
+      color: var(--text);
+      position: relative;
+    }
+
+    .quote-text em {
+      color: var(--gold);
+      font-style: normal;
+    }
+
+    .quote-author {
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* ─── HASHTAGS ─── */
+    .hashtags-section {
+      padding: 4rem 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .hashtags-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+
+    .hashtag {
+      display: inline-block;
+      padding: 0.5rem 1.2rem;
+      background: var(--dark-3);
+      border: 1px solid rgba(201, 168, 76, 0.2);
+      border-radius: 2px;
+      font-size: 0.82rem;
+      color: var(--gold);
+      font-weight: 500;
+      transition: all 0.3s;
+      cursor: default;
+    }
+
+    .hashtag:hover {
+      background: rgba(201, 168, 76, 0.1);
+      border-color: var(--gold);
+    }
+
+    /* ─── CTA FINALE ─── */
+    .cta-section {
+      background: var(--dark-2);
+      padding: 6rem 2rem;
+      text-align: center;
+    }
+
+    .cta-inner {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .cta-section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      margin-bottom: 1.5rem;
+    }
+
+    .cta-section p {
+      font-size: 1rem;
+      line-height: 1.75;
+      color: rgba(232, 224, 208, 0.75);
+      margin-bottom: 2.5rem;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--gold);
+      color: var(--dark);
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.9rem 2rem;
+      border-radius: 2px;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+
+    .btn-primary:hover {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: transparent;
+      color: var(--text);
+      font-weight: 500;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.9rem 2rem;
+      border-radius: 2px;
+      text-decoration: none;
+      border: 1px solid rgba(232, 224, 208, 0.3);
+      transition: all 0.3s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--dark);
+      border-top: 1px solid rgba(201, 168, 76, 0.1);
+      padding: 2.5rem 2rem;
+      text-align: center;
+    }
+
+    footer p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    footer a {
+      color: var(--gold);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* ─── PROGRESS BAR ─── */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      background: linear-gradient(to right, var(--gold), var(--neon-cyan));
+      z-index: 200;
+      transition: width 0.1s;
+    }
+
+    /* ─── REVEAL ANIMATION ─── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── KEYFRAMES ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .vs-divider {
+        flex-direction: row;
+        padding-top: 0;
+      }
+
+      .vs-line {
+        width: 80px;
+        height: 1px;
+        background: linear-gradient(to right, transparent, var(--gold), transparent);
+      }
+
+      .nav-links {
+        display: none;
+      }
+    }
+
+    /* ─── TIMELINE ─── */
+    .timeline {
+      position: relative;
+      margin-top: 3rem;
+      padding-left: 2rem;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--gold), var(--neon-blue), transparent);
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 2.5rem;
+      padding-left: 2rem;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: -2.45rem;
+      top: 0.3rem;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 10px rgba(201, 168, 76, 0.5);
+    }
+
+    .timeline-item.modern .timeline-dot {
+      background: var(--neon-cyan);
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+    }
+
+    .timeline-era {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.4rem;
+    }
+
+    .timeline-item.modern .timeline-era {
+      color: var(--neon-cyan);
+    }
+
+    .timeline-item h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .timeline-item p {
+      font-size: 0.9rem;
+      line-height: 1.65;
+      color: rgba(232, 224, 208, 0.7);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Progress Bar -->
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- Nav -->
+  <nav id="mainNav">
+    <a href="#" class="nav-logo">Il Grande Inganno</a>
+    <ul class="nav-links">
+      <li><a href="#analisi">Analisi</a></li>
+      <li><a href="#parallelo">Parallelo</a></li>
+      <li><a href="#meccanismi">Meccanismi</a></li>
+      <li><a href="#dati">Dati</a></li>
+      <li><a href="#articolo">Articolo</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero" style="padding:0; max-width:100%;">
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-tag">Critica Sociale · Psicologia del Controllo</div>
+      <h1 class="hero-title">
+        Il Grande Inganno:<br />
+        da <span class="highlight">Adamo ed Eva</span><br />
+        all'Algoritmo
+      </h1>
+      <p class="hero-subtitle">
+        Siamo passati dal timore di Dio alla paura di non ricevere abbastanza 'like': il gioco è lo stesso, è solo cambiato il mazzo di carte.
+      </p>
+      <a href="#analisi" class="hero-cta">
+        Scopri l'inganno ↓
+      </a>
+    </div>
+    <div class="scroll-indicator">
+      <span>Scorri</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- Analisi -->
+  <section id="analisi">
+    <div class="section-label">Il Punto di Partenza</div>
+    <h2 class="section-title reveal">Il primo esperimento di psicologia del controllo</h2>
+    <p class="section-text reveal">
+      Per secoli ci hanno raccontato che siamo stati cacciati da un giardino per colpa di un frutto. Ci hanno spiegato la sofferenza, la morte e la fatica come una "punizione" per un errore che non abbiamo mai commesso. Ma se guardiamo bene dietro il velo, la verità è molto più cinica: quel racconto non è una spiegazione del mondo, è il <strong>primo esperimento riuscito di psicologia del controllo</strong>.
+    </p>
+    <br />
+    <p class="section-text reveal">
+      La storia di Adamo ed Eva non è un resoconto spirituale, ma un <strong>sistema di gestione del consenso</strong> ideato secoli prima che la psicologia diventasse una scienza. Inventando il "peccato originale", hanno installato un guinzaglio invisibile nelle nostre menti: il senso di colpa. Ci hanno convinti di essere "sbagliati" per natura, rendendoci dipendenti da chiunque vendesse una redenzione.
+    </p>
+
+    <div class="verita-grid" style="margin-top: 3rem;">
+      <div class="verita-card reveal">
+        <div class="verita-number">1</div>
+        <h3>La Paura è il Motore</h3>
+        <p>La morte e l'ignoto spaventano. Se ti offro una spiegazione — anche crudele — ti rendo obbediente. Il controllo nasce sempre dalla gestione della paura dell'ignoto.</p>
+      </div>
+      <div class="verita-card reveal">
+        <div class="verita-number">2</div>
+        <h3>La Colpa è un Guinzaglio</h3>
+        <p>Se ti convinco che sei "difettoso", passerai la vita a cercare in me la soluzione o il perdono. Il senso di colpa è la catena più efficace mai inventata.</p>
+      </div>
+      <div class="verita-card reveal">
+        <div class="verita-number">3</div>
+        <h3>Il Mito Ordina il Caos</h3>
+        <p>Trasformare un evento casuale — una malattia, un fulmine — in una "punizione divina" dà l'illusione che il mondo abbia un ordine, anche se terribile.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Parallelo -->
+  <div class="parallelo" id="parallelo">
+    <div class="parallelo-inner">
+      <div class="section-label">Il Confronto</div>
+      <h2 class="section-title reveal">Ieri il Sacerdote, Oggi l'Algoritmo</h2>
+      <p class="section-text reveal">
+        Oggi pensiamo di essere liberi perché non crediamo più alle "favole" della Genesi, ma siamo caduti in un sistema moderno ancora più sofisticato. Abbiamo sostituito l'Eden con la perfezione estetica dei social e il giudizio di Dio con il <strong>tribunale dei follower</strong>.
+      </p>
+
+      <div class="comparison-grid">
+        <div class="comparison-col antico reveal">
+          <h3>⚡ Il Controllo Antico</h3>
+          <div class="comparison-item">
+            <div class="comparison-icon">🏛️</div>
+            <p><strong>Il Sacerdote</strong>Intermediario tra l'uomo e il divino. Detiene il monopolio dell'interpretazione e della redenzione.</p>
+          </div>
+          <div class="comparison-item">
+            <div class="comparison-icon">📜</div>
+            <p><strong>Il Peccato Originale</strong>Strumento di colpevolizzazione universale. Nessuno nasce innocente, tutti hanno bisogno di essere "salvati".</p>
+          </div>
+          <div class="comparison-item">
+            <div class="comparison-icon">🔥</div>
+            <p><strong>L'Ira Divina</strong>La paura della punizione ultraterrena garantisce l'obbedienza anche in assenza di controllo fisico.</p>
+          </div>
+          <div class="comparison-item">
+            <div class="comparison-icon">🌿</div>
+            <p><strong>L'Eden Perduto</strong>Un paradiso irraggiungibile che mantiene vivo il desiderio di redenzione e il senso di mancanza.</p>
+          </div>
+        </div>
+
+        <div class="vs-divider">
+          <div class="vs-line"></div>
+          <div class="vs-circle">VS</div>
+          <div class="vs-line"></div>
+        </div>
+
+        <div class="comparison-col moderno reveal">
+          <h3>📱 Il Controllo Moderno</h3>
+          <div class="comparison-item">
+            <div class="comparison-icon">🤖</div>
+            <p><strong>L'Algoritmo</strong>Intermediario tra l'utente e la visibilità. Decide chi viene visto, chi viene premiato, chi viene ignorato.</p>
+          </div>
+          <div class="comparison-item">
+            <div class="comparison-icon">😔</div>
+            <p><strong>L'Inadeguatezza Digitale</strong>Nessuno è abbastanza bello, abbastanza ricco, abbastanza felice. La perfezione estetica dei social è il nuovo peccato originale.</p>
+          </div>
+          <div class="comparison-item">
+            <div class="comparison-icon">👎</div>
+            <p><strong>La Cancel Culture</strong>La paura dell'esclusione sociale e della "scomunica" digitale garantisce la conformità e l'autocensura.</p>
+          </div>
+          <div class="comparison-item">
+            <div class="comparison-icon">✨</div>
+            <p><strong>La Perfezione Estetica</strong>Un ideale irraggiungibile che mantiene vivo il consumo compulsivo e il senso di inadeguatezza permanente.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <section id="timeline">
+    <div class="section-label">La Linea del Tempo</div>
+    <h2 class="section-title reveal">Da un Padrone all'Altro</h2>
+    <p class="section-text reveal">
+      La storia dell'umanità è una sequenza di sistemi di controllo che si sostituiscono l'uno all'altro, cambiando forma ma mantenendo la stessa struttura psicologica di base.
+    </p>
+    <div class="timeline">
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-era">Antichità</div>
+        <h3>Il Mito Fondativo</h3>
+        <p>La narrazione del peccato originale viene codificata. La colpa collettiva diventa strumento di gestione del consenso. Chi controlla il mito controlla la società.</p>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-era">Medioevo</div>
+        <h3>L'Istituzionalizzazione del Controllo</h3>
+        <p>La Chiesa diventa l'unica intermediaria tra l'uomo e la salvezza. L'Inquisizione trasforma il dubbio in crimine. La paura dell'inferno garantisce l'obbedienza temporale.</p>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-era">Modernità</div>
+        <h3>La Secolarizzazione del Controllo</h3>
+        <p>Lo Stato e il mercato sostituiscono la Chiesa. La propaganda di massa e la pubblicità creano nuovi bisogni artificiali. Il consumo diventa la nuova religione.</p>
+      </div>
+      <div class="timeline-item modern reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-era">Era Digitale</div>
+        <h3>L'Algoritmo come Nuovo Sacerdote</h3>
+        <p>I social media creano un sistema di ricompensa basato sull'approvazione altrui. La dopamina dei like sostituisce la grazia divina. La cancel culture è la nuova Inquisizione.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Meccanismi -->
+  <div class="chart-section" id="meccanismi">
+    <div class="chart-inner">
+      <div class="section-label">Il Controllo Orizzontale</div>
+      <h2 class="section-title reveal">I 4 Meccanismi del Nuovo Controllo</h2>
+      <p class="section-text reveal">
+        Ecco come funziona oggi il sistema di controllo moderno, più sofisticato ma identico nella struttura psicologica a quello antico.
+      </p>
+      <div class="meccanismi-grid" style="margin-top: 3rem;">
+        <div class="meccanismo-card reveal">
+          <div class="meccanismo-icon">⚖️</div>
+          <h3>Appartenenza Polarizzata</h3>
+          <p>I social sono i nuovi tribunali dell'Inquisizione. Se non ti schieri o sollevi un dubbio, scatta la "scomunica" della cancel culture. Il condizionamento è la paura dell'esclusione sociale.</p>
+        </div>
+        <div class="meccanismo-card reveal">
+          <div class="meccanismo-icon">👁️</div>
+          <h3>Mito della Trasparenza</h3>
+          <p>Ci hanno condizionati a credere di dover mostrare ogni aspetto della nostra vita. Abbiamo scambiato la nostra privacy con un senso illusorio di importanza e visibilità.</p>
+        </div>
+        <div class="meccanismo-card reveal">
+          <div class="meccanismo-icon">😊</div>
+          <h3>Dittatura della Felicità</h3>
+          <p>Ieri eravamo "peccatori", oggi siamo "inadeguati". Se sei triste o stanco, la colpa è tua perché non hai "pensato positivo". È un modo per scaricare le colpe del sistema sull'individuo.</p>
+        </div>
+        <div class="meccanismo-card reveal">
+          <div class="meccanismo-icon">🧙</div>
+          <h3>Mito del Guru</h3>
+          <p>Seguiamo ciecamente figure carismatiche che usano la stessa psicologia dei sacerdoti antichi per venderci rimedi a problemi che spesso loro stessi hanno creato.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dati / Charts -->
+  <section id="dati">
+    <div class="section-label">Dati e Tendenze</div>
+    <h2 class="section-title reveal">Il Controllo in Numeri</h2>
+    <p class="section-text reveal">
+      I dati mostrano come i meccanismi di controllo digitale abbiano raggiunto una pervasività senza precedenti nella storia umana, superando per efficacia qualsiasi sistema precedente.
+    </p>
+    <div class="chart-tabs">
+      <button class="chart-tab active" onclick="showChart('dipendenza')">Dipendenza Digitale</button>
+      <button class="chart-tab" onclick="showChart('confronto')">Confronto Storico</button>
+      <button class="chart-tab" onclick="showChart('meccanismi')">Meccanismi di Controllo</button>
+    </div>
+    <div class="chart-container">
+      <canvas id="mainChart"></canvas>
+    </div>
+    <p class="chart-note">* Dati elaborati a fini illustrativi sulla base di ricerche pubbliche in psicologia sociale e media studies.</p>
+  </section>
+
+  <!-- Quote -->
+  <div class="quote-section">
+    <blockquote class="quote-text">
+      "Siamo passati da una sottomissione all'altra, cambiando solo il nome del <em>'padrone'</em> e temendo la mancanza di <em>'like'</em> invece dell'ira divina."
+    </blockquote>
+    <p class="quote-author">— Salvatore Iovino, Il Grande Inganno</p>
+  </div>
+
+  <!-- Articolo originale -->
+  <section id="articolo">
+    <div class="section-label">La Conclusione</div>
+    <h2 class="section-title reveal">La Vera Libertà</h2>
+    <p class="section-text reveal">
+      La biologia non conosce peccato. Il dolore fisico è solo un terminale elettrico che ci avverte di un guasto; il dolore psicologico è il risultato di percezioni ed emozioni elaborate dalla mente. La morte non è un castigo, è la naturale conclusione di un ciclo biologico.
+    </p>
+    <br />
+    <p class="section-text reveal">
+      <strong>La vera libertà inizia quando smettiamo di cercare un "perché" filosofico al fatto che siamo fragili</strong> e accettiamo che siamo semplicemente esseri biologici, liberi dall'obbligo di essere perdonati. Liberi dalla necessità di essere "abbastanza" per qualcuno — che sia Dio, l'algoritmo, o il tribunale dei follower.
+    </p>
+  </section>
+
+  <!-- Hashtags -->
+  <div class="hashtags-section">
+    <div class="section-label" style="justify-content: center;">Condividi il Pensiero</div>
+    <div class="hashtags-wrap">
+      <span class="hashtag">#libertàdipensiero</span>
+      <span class="hashtag">#consapevolezza</span>
+      <span class="hashtag">#criticasociale</span>
+      <span class="hashtag">#psicologiadelcontrollo</span>
+      <span class="hashtag">#societàmoderna</span>
+      <span class="hashtag">#oltreilmito</span>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <div class="cta-inner">
+      <h2 class="reveal">Leggi l'Articolo Completo</h2>
+      <p class="reveal">
+        Approfondisci l'analisi di Salvatore Iovino sul parallelo tra il mito di Adamo ed Eva e i meccanismi di controllo della società digitale contemporanea.
+      </p>
+      <div class="cta-buttons">
+        <a href="https://www.salvatoreiovino.it/2026/03/il-grande-inganno-da-adamo-ed-eva.html" target="_blank" class="btn-primary">
+          Leggi l'articolo →
+        </a>
+        <a href="https://www.salvatoreiovino.it" target="_blank" class="btn-secondary">
+          Visita il Blog
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>
+      Contenuto originale di <a href="https://www.salvatoreiovino.it" target="_blank">Salvatore Iovino</a> · 
+      <a href="https://www.salvatoreiovino.it/2026/03/il-grande-inganno-da-adamo-ed-eva.html" target="_blank">Il Grande Inganno: da Adamo ed Eva all'Algoritmo</a>
+      <br />
+      Pagina web interattiva realizzata per la presentazione visiva dei contenuti · 2026
+    </p>
+  </footer>
+
+  <script>
+    // ─── Progress Bar ───
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (scrollTop / docHeight) * 100;
+      document.getElementById('progressBar').style.width = progress + '%';
+
+      // Nav scroll
+      const nav = document.getElementById('mainNav');
+      if (scrollTop > 50) nav.classList.add('scrolled');
+      else nav.classList.remove('scrolled');
+    });
+
+    // ─── Hero BG ───
+    window.addEventListener('load', () => {
+      document.getElementById('heroBg').classList.add('loaded');
+    });
+
+    // ─── Reveal on Scroll ───
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    reveals.forEach(el => observer.observe(el));
+
+    // ─── Charts ───
+    let currentChart = null;
+
+    const chartData = {
+      dipendenza: {
+        type: 'bar',
+        label: 'Ore medie giornaliere trascorse sui social media per fascia d\'età (2024)',
+        labels: ['13–17 anni', '18–24 anni', '25–34 anni', '35–44 anni', '45–54 anni', '55+ anni'],
+        datasets: [{
+          label: 'Ore/giorno',
+          data: [4.8, 3.9, 3.1, 2.4, 1.8, 1.2],
+          backgroundColor: [
+            'rgba(201,168,76,0.8)',
+            'rgba(201,168,76,0.7)',
+            'rgba(79,195,247,0.7)',
+            'rgba(79,195,247,0.6)',
+            'rgba(79,195,247,0.5)',
+            'rgba(79,195,247,0.4)',
+          ],
+          borderColor: 'transparent',
+          borderRadius: 3,
+        }]
+      },
+      confronto: {
+        type: 'radar',
+        label: 'Efficacia dei meccanismi di controllo (scala 0–100)',
+        labels: ['Pervasività', 'Velocità di diffusione', 'Resistenza critica', 'Dipendenza indotta', 'Invisibilità del meccanismo', 'Consenso volontario'],
+        datasets: [
+          {
+            label: 'Controllo Religioso (Medioevo)',
+            data: [70, 20, 80, 60, 55, 40],
+            borderColor: 'rgba(200,120,74,0.9)',
+            backgroundColor: 'rgba(200,120,74,0.15)',
+            pointBackgroundColor: 'rgba(200,120,74,0.9)',
+          },
+          {
+            label: 'Controllo Digitale (2024)',
+            data: [95, 98, 30, 88, 85, 92],
+            borderColor: 'rgba(79,195,247,0.9)',
+            backgroundColor: 'rgba(79,195,247,0.15)',
+            pointBackgroundColor: 'rgba(79,195,247,0.9)',
+          }
+        ]
+      },
+      meccanismi: {
+        type: 'doughnut',
+        label: 'Distribuzione dei meccanismi di controllo digitale percepiti dagli utenti',
+        labels: ['Paura dell\'esclusione', 'Inadeguatezza estetica', 'Dipendenza da approvazione', 'Pressione alla conformità', 'Ansia da performance'],
+        datasets: [{
+          data: [28, 22, 25, 15, 10],
+          backgroundColor: [
+            'rgba(201,168,76,0.85)',
+            'rgba(79,195,247,0.85)',
+            'rgba(0,229,255,0.75)',
+            'rgba(139,26,26,0.75)',
+            'rgba(26,58,139,0.75)',
+          ],
+          borderColor: 'rgba(17,17,17,0.5)',
+          borderWidth: 2,
+        }]
+      }
+    };
+
+    function showChart(type) {
+      // Update tabs
+      document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+
+      if (currentChart) currentChart.destroy();
+
+      const ctx = document.getElementById('mainChart').getContext('2d');
+      const d = chartData[type];
+
+      const config = {
+        type: d.type,
+        data: {
+          labels: d.labels,
+          datasets: d.datasets,
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: {
+                color: 'rgba(232,224,208,0.8)',
+                font: { family: 'Inter', size: 12 },
+                padding: 20,
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(17,17,17,0.95)',
+              titleColor: 'rgba(201,168,76,1)',
+              bodyColor: 'rgba(232,224,208,0.85)',
+              borderColor: 'rgba(201,168,76,0.3)',
+              borderWidth: 1,
+            }
+          },
+          scales: d.type === 'radar' ? {
+            r: {
+              grid: { color: 'rgba(232,224,208,0.1)' },
+              pointLabels: { color: 'rgba(232,224,208,0.7)', font: { size: 11 } },
+              ticks: { display: false },
+              angleLines: { color: 'rgba(232,224,208,0.1)' },
+            }
+          } : d.type === 'bar' ? {
+            x: {
+              grid: { color: 'rgba(232,224,208,0.05)' },
+              ticks: { color: 'rgba(232,224,208,0.6)', font: { size: 11 } },
+            },
+            y: {
+              grid: { color: 'rgba(232,224,208,0.05)' },
+              ticks: { color: 'rgba(232,224,208,0.6)', font: { size: 11 } },
+            }
+          } : undefined,
+        }
+      };
+
+      currentChart = new Chart(ctx, config);
+    }
+
+    // Init first chart
+    document.addEventListener('DOMContentLoaded', () => {
+      const ctx = document.getElementById('mainChart').getContext('2d');
+      const d = chartData.dipendenza;
+      currentChart = new Chart(ctx, {
+        type: d.type,
+        data: { labels: d.labels, datasets: d.datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: { color: 'rgba(232,224,208,0.8)', font: { family: 'Inter', size: 12 } }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(17,17,17,0.95)',
+              titleColor: 'rgba(201,168,76,1)',
+              bodyColor: 'rgba(232,224,208,0.85)',
+              borderColor: 'rgba(201,168,76,0.3)',
+              borderWidth: 1,
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(232,224,208,0.05)' },
+              ticks: { color: 'rgba(232,224,208,0.6)', font: { size: 11 } },
+            },
+            y: {
+              grid: { color: 'rgba(232,224,208,0.05)' },
+              ticks: { color: 'rgba(232,224,208,0.6)', font: { size: 11 } },
+            }
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
